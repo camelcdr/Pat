@@ -1,0 +1,84 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <queue>
+#define Inf 100000000
+using namespace std;
+struct Path {
+	int v1, v2;
+	int cost;
+};
+struct Graph {
+	int nVertex;
+	vector<Path> pathes;
+};
+bool comp(Path path1, Path path2)
+{
+	return path1.cost < path2.cost;
+}
+bool sameSet(vector<int> &set, int v1, int v2)
+{
+	while (set[v1] >= 0) {
+		v1 = set[v1];
+	}
+	while (set[v2] >= 0) {
+		v2 = set[v2];
+	}
+	return v1 == v2;
+}
+void unionSet(vector<int> &set, int v1, int v2)
+{
+	while (set[v1] >= 0) {
+		v1 = set[v1];
+	}
+	while (set[v2] >= 0) {
+		v2 = set[v2];
+	}
+	set[v1] = v2;
+}
+void kruskal(Graph graph)
+{
+	vector<int> set(graph.nVertex + 1, -1);
+	vector<bool> visited(graph.nVertex + 1, false);
+	int idx = 0, cnt = 0;
+	int costSum = 0;
+	while (idx < graph.pathes.size()) {
+		Path path = graph.pathes[idx++];		// get the shortest path from the rest pathes
+		if (sameSet(set, path.v1, path.v2)) {
+			continue;
+		}
+		if (!visited[path.v1]) {
+			++cnt;
+			visited[path.v1] = true;
+		}
+		if (!visited[path.v2]) {
+			++cnt;
+			visited[path.v2] = true;
+		}
+		unionSet(set, path.v1, path.v2);
+		costSum += path.cost;
+	}
+	if (cnt == graph.nVertex) {
+		cout << costSum << endl;
+	}
+	else {
+		cout << "-1" << endl;
+	}
+}
+int main()
+{
+	freopen("in.txt", "r", stdin);
+	Graph graph;
+	int n, m;
+	cin >> n >> m;
+	graph.nVertex = n;
+	for (int i = 0; i < m; ++i) {
+		Path path;
+		cin >> path.v1 >> path.v2 >> path.cost;
+		graph.pathes.push_back(path);
+	}
+	sort(graph.pathes.begin(), graph.pathes.end(), comp);
+	kruskal(graph);
+
+	return 0;
+}
